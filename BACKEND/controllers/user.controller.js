@@ -1,6 +1,8 @@
 const usermodel = require("../models/user.model");
 const userservice = require('../services/user.service');
 const { validationResult } = require('express-validator'); 
+const Blacklist=require('../models/blocklisttoken.model');
+
 
 module.exports.registerUser = async (req, res, next) => {
     const errors = validationResult(req); // No more typo
@@ -47,6 +49,39 @@ module.exports.loginuser=async(req,res,next)=>{
     }
 
     const token=user.generateAuthToken();
+    
+    res.cookie('token',token );
 
     res.status(200).json({ token,user });
 }
+
+//getUserProfile for profile 
+module.exports.getUserProfile=async(req,res,next)=>{
+    res.status(200).json(req.user);
+}
+
+
+//logout user
+module.exports.logoutUser = async (req, res, next) => {
+    try {
+        // Extract token from cookies or Authorization header
+        const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+
+        if (token) {
+            // Add token to blacklist for invalidation with TTL (optional)
+            await Blacklist.create({ token });
+
+            // Clear token from cookies
+            res.clearCookie('token');
+
+            // Return success response
+            return res.status(200).json({ message: 'Logout successful' });
+        }
+
+        // No token case
+        return res.status(400).json({ message: 'No token provided to logout' });
+    } catch (err) {
+        console.error('Logout error:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
