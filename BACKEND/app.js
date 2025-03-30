@@ -7,7 +7,7 @@ const cookieparser=require('cookie-parser')
 
 const connectToDb=require("./db/db")
 const userroute=require('./routes/user.routes')
-
+const captainroute=require('./routes/captain.routes')
 
 
 connectToDb();
@@ -25,5 +25,6 @@ app.get("/",(req,res)=>{
 })
 
 app.use("/users",userroute)
+app.use("/captains",captainroute);
 
 module.exports=app;
