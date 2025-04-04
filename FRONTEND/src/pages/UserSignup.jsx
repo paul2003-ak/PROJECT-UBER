@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState ,useContext} from 'react';
+import { Link , useNavigate } from 'react-router-dom';
+import {UserDataContext} from '../context/Usercontext';
+import axios from 'axios'
 
 const UserSignup = () => {
 
@@ -7,27 +9,50 @@ const UserSignup = () => {
   const [password, setPassword] = useState('')
   const [firstname, setFirstname] = useState('')
   const [lastname, setLastname] = useState('')
-  const [userdata, setUserdata] = useState({})
+
+    const navigate=useNavigate();
+
+    const {setUser} = useContext(UserDataContext)
 
 
-  const submitHandler=(e)=>{
+  const submitHandler= async(e)=>{
     e.preventDefault();
 
-    setUserdata({
+    const newuser={
       fullname:{
         firstname:firstname,
         lastname:lastname
       },
       email:email,
       password:password
-    })
-    console.log(userdata)
+    }
 
+    try{
+    const response=await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/users/register`,
+      newuser
+    );
+
+    if(response.status===201){//201 come when create user successfully
+
+      const data=response.data
+
+      setUser(data.user)
+
+      localStorage.setItem('token',data.token);
+
+      navigate('/home')
+    }
+  }catch(error){
+    console.error("Signup Error:", error.response?.data || error.message);
+    alert("Signup failed! Please try again.");
+  }
+  
     setEmail('')
     setFirstname('')
     setLastname('')
     setPassword('')
-  }
+  };
 
   return (
     <div className='flex flex-col justify-between min-h-screen bg-white px-6 py-10 md:max-w-md md:mx-auto'>
