@@ -1,34 +1,65 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { captainDatacontext } from '../context/captaincontext';
+import axios from 'axios';
 
 const CaptainSignup = () => {
+  const navigate = useNavigate();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [firstname, setFirstname] = useState('')
-  const [lastname, setLastname] = useState('')
-  const [userdata, setUserdata] = useState({})
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [vehicleColor, setVehicleColor] = useState('');
+  const [vehiclePlate, setVehiclePlate] = useState('');
+  const [vehicleCapacity, setVehicleCapacity] = useState('');
+  const [vehicleType, setVehicleType] = useState('');
 
+  const { setCaptain } = useContext(captainDatacontext);
 
-  const submitHandler=(e)=>{
+  const submitHandler = async (e) => {
     e.preventDefault();
 
-    setUserdata({
+    const newcaptain = {
       fullname:{
         firstname:firstname,
-        lastname:lastname
+        lastname:lastname,
       },
       email:email,
-      password:password
-    })
-    console.log(userdata)
+      password:password,
+      vehicle: {
+        color:vehicleColor,
+        plate:vehiclePlate,
+        capacity:vehicleCapacity,
+        vehicleType:vehicleType,
+      }
+    };
+   
 
-    setEmail('')
-    setFirstname('')
-    setLastname('')
-    setPassword('')
+      try{
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, newcaptain);
+
+      if (response.status === 201) {
+        const data = response.data;
+        setCaptain(data.captain);
+        localStorage.setItem('token', data.token);
+        navigate('/captainhome');
+      }
+
+      // Reset form fields
+      setEmail('');
+      setFirstname('');
+      setLastname('');
+      setPassword('');
+      setVehicleColor('');
+      setVehiclePlate('');
+      setVehicleCapacity('');
+      setVehicleType('');
+    }catch(error){
+      console.log(error)
+    }
   }
+
 
   return (
     <div className='flex flex-col justify-between min-h-screen bg-white px-6 py-10 md:max-w-md md:mx-auto'>
@@ -52,7 +83,7 @@ const CaptainSignup = () => {
               type='text'
               placeholder='First Name'
               value={firstname}
-              onChange={(e)=>{
+              onChange={(e) => {
                 setFirstname(e.target.value);
               }}
             />
@@ -63,7 +94,7 @@ const CaptainSignup = () => {
               type='text'
               placeholder='Last Name'
               value={lastname}
-              onChange={(e)=>{
+              onChange={(e) => {
                 setLastname(e.target.value);
               }}
             />
@@ -75,7 +106,7 @@ const CaptainSignup = () => {
             required
             value={email}
             onChange={(e) => {
-            setEmail(e.target.value)
+              setEmail(e.target.value)
             }}
             className='bg-gray-100 rounded px-4 py-3 border w-full text-lg'
             type='email'
@@ -87,12 +118,66 @@ const CaptainSignup = () => {
           <input
             required
             value={password}
-            onChange={(e) =>{ setPassword(e.target.value)}}
+            onChange={(e) => { setPassword(e.target.value) }}
             className='bg-gray-100 rounded px-4 py-3 border w-full text-lg'
             type='password'
             placeholder='Password'
           />
 
+
+          {/*start the information for vahicle*/}
+          <h3 className='text-lg font-medium mb-2'>Vahicle Information</h3>
+
+          <div className='flex gap-4 mb-7'>
+
+            <input
+              required
+              value={vehicleColor}
+              onChange={(e) => { setVehicleColor(e.target.value) }}
+              className='bg-gray-100 rounded px-4 py-2 border w-full text-lg'
+              type='text'
+              placeholder='vahicle Color'
+            />
+
+            <input
+              required
+              value={vehiclePlate}
+              onChange={(e) => { setVehiclePlate(e.target.value) }}
+              className='bg-gray-100 rounded px-4 py-3 border w-full text-lg'
+              type='text'
+              placeholder='vahicle Plate'
+            />
+          </div>
+
+
+          <div className='flex gap-4 mb-7'>
+
+            <input
+              required
+              value={vehicleCapacity}
+              onChange={(e) => { setVehicleCapacity(e.target.value) }}
+              className='bg-gray-100 rounded px-4 py-2 border w-full text-lg'
+              type='Number'
+              placeholder='vehicle Capacity'
+            />
+
+            <select
+              required
+              className='bg-gray-100 rounded px-4 py-2 border w-full text-lg'
+              placeholder='vehicleType'
+              value={vehicleType}
+              onChange={(e)=>{
+                setVehicleType(e.target.value)
+              }}
+            >
+              
+              <option value="" disabled>Select Vhicle Type</option>
+              <option value="car">car</option>
+              <option value="auto">auto</option>
+              <option value="motorcycle">motorcycle</option>
+            </select>
+          </div>
+{/* here the vehcle information end */}
 
           <button className='bg-black text-white font-semibold rounded px-4 py-3 w-full text-lg hover:bg-gray-800'>
             Sign Up
@@ -111,7 +196,7 @@ const CaptainSignup = () => {
       {/* Disclaimer */}
       <div className='text-xs text-gray-500 text-center mt-6'>
         <p>
-        This site is protected by reCAPTCHA and the <span className='underline'>Google Privacy Policy</span> and  <span className='underline'>Terms of Service apply</span>.</p>
+          This site is protected by reCAPTCHA and the <span className='underline'>Google Privacy Policy</span> and  <span className='underline'>Terms of Service apply</span>.</p>
       </div>
 
 
