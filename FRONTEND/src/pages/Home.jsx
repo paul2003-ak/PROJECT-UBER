@@ -172,15 +172,15 @@ const Home = () => {
       </div>
 
       <div ref={confirmpanelref} className='fixed w-full z-10 bottom-0 translate-y-full px-3 py-6 bg-white'>
-            <Confirmvehicle setConfirmride={setConfirmride} setLookingforadriver={setLookingforadriver}/>
+        <Confirmvehicle setConfirmride={setConfirmride} setLookingforadriver={setLookingforadriver} />
       </div>
 
       <div ref={lookingforadriverref} className='fixed w-full z-10 bottom-0 translate-y-full px-3 py-6 bg-white'>
-            <LookingforDriver setLookingforadriver={setLookingforadriver}/>
+        <LookingforDriver setLookingforadriver={setLookingforadriver} />
       </div>
 
       <div ref={waitingfordriverref} className='fixed w-full z-10 bottom-0  px-3 py-6 bg-white'>
-            <WaitforDriver setWaitingfordriver={setWaitingfordriver}/>
+        <WaitforDriver setWaitingfordriver={setWaitingfordriver} />
       </div>
 
 
